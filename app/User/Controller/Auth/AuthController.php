@@ -21,7 +21,10 @@ class AuthController extends BaseController
         $this->userValidations = new UserValidations();
     }
 
-    // Registering Super Admin
+    // Registration logic
+    /**
+     * @return ResponseInterface
+     */
 
     public function createUser(): ResponseInterface
     {
@@ -104,6 +107,9 @@ class AuthController extends BaseController
 
 
     // Login logic
+    /**
+     * @return ResponseInterface
+     */
      public function checkLogIn(): ResponseInterface
     {
         $data=$this->request->getJSON(true);

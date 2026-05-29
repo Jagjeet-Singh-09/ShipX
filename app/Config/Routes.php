@@ -14,3 +14,4 @@ $routes->post('/addGroups', '\App\User\Controller\Auth\UserController::createUse
 $routes->get('/getAllUsers', '\App\User\Controller\Auth\UserController::getAllUser');
 $routes->get('getUser/(:num)', '\App\User\Controller\Auth\UserController::getSpecificUser/$1');
 $routes->get('getGroupMembers/(:num)', '\App\User\Controller\Auth\UserController::getGroupMembers/$1');
+$routes->get('getHierarchy/(:num)', '\App\User\Controller\Auth\UserController::getHierarchy/$1');
