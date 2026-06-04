@@ -2,61 +2,13 @@
 
 namespace App\User\Model\Auth;
 
-use Config\Database;
-use CodeIgniter\Database\BaseConnection;
+use App\Models\BaseModel;
 
-class UserModel
+/**
+ * Model for user-related database operations.
+ */
+class UserModel extends BaseModel
 {
-    /**
-     * Database connection instance.
-     *
-     * @var BaseConnection
-     */
-    protected BaseConnection $db;
-
-    /**
-     * Constructor.
-     * Initializes database connection.
-     */
-    public function __construct()
-    {
-        $this->db = Database::connect();
-    }
-
-    /**
-     * Add a new user to the database.
-     *
-     * @param array $data User data
-     *
-     * @return int Inserted user ID
-     */
-    public function addUser(array $data): int
-    {
-        $sql = "INSERT INTO users 
-        (
-            first_name,
-            last_name,
-            email,
-            phone,
-            dept_id,
-            group_id,
-            status
-        ) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        $this->db->query($sql, [
-            $data['first_name'],
-            $data['last_name'],
-            $data['email'],
-            $data['phone'],
-            $data['dept_id'],
-            $data['group_id'],
-            $data['status']
-        ]);
-
-        return $this->db->insertID();
-    }
-
     /**
      * Create a new user group.
      *
@@ -66,19 +18,9 @@ class UserModel
      */
     public function createUserGroup(array $data): bool
     {
-        $sql = "INSERT INTO user_groups
-        (
-            group_name,
-            path,
-            dept_id
-        )
-        VALUES (?, ?, ?)";
+        $sql = "INSERT INTO user_groups (group_name, manager_id, dept_id) VALUES (?, ?, ?)";
 
-        return $this->db->query($sql, [
-            $data['group_name'],
-            $data['path'],
-            $data['dept_id']
-        ]);
+        return $this->db->query($sql, [$data['group_name'], $data['manager_id'], $data['dept_id']]);
     }
 
     /**
@@ -98,9 +40,9 @@ class UserModel
      *
      * @param int $id User ID
      *
-     * @return array
+     * @return array|null
      */
-    public function getSpecificUser(int $id): array
+    public function getSpecificUser(int $id): ?array
     {
         $sql = "SELECT * FROM users WHERE id = ?";
 
@@ -134,42 +76,14 @@ class UserModel
      */
     public function setHierarchy(int $userId, ?int $path): bool
     {
-        if ($path === null) {
 
-            $sql = "INSERT INTO hierarchy 
-                    (
-                        user_id,
-                        path,
-                        level
-                    ) 
-                    VALUES (?, ?, ?)";
 
-            return $this->db->query($sql, [$userId, $path, 0]);
-        }
+        $sql = "INSERT INTO hierarchy (user_id,path) VALUES (?, ?)";
 
-        $sql = "SELECT level FROM hierarchy WHERE user_id = ?";
-
-        $query = $this->db->query($sql, [$path])->getRowArray();
-
-        $managerLevel = $query['level'];
-
-        $userLevel = $managerLevel + 1;
-
-        $sql2 = "INSERT INTO hierarchy 
-                (
-                    user_id,
-                    path,
-                    level
-                ) 
-                VALUES (?, ?, ?)";
-
-        return $this->db->query($sql2, [
-            $userId,
-            $path,
-            $userLevel
-        ]);
+        return $this->db->query($sql, [$userId,$path]);
     }
 
+ 
     /**
      * Fetch hierarchy details recursively for a user.
      *
@@ -179,12 +93,7 @@ class UserModel
      */
     public function getHierarchy(int $userId): array
     {
-        $sql = "SELECT 
-                    path,
-                    level,
-                    user_id
-                FROM hierarchy
-                WHERE user_id = ?";
+        $sql = "SELECT path, user_id FROM hierarchy WHERE user_id = ?";
 
         $query = $this->db->query($sql, [$userId])->getRowArray();
 
@@ -195,7 +104,6 @@ class UserModel
         $data = [
             [
                 "user_id" => $query['user_id'],
-                "level"   => $query['level'],
                 "path"    => $query['path']
             ]
         ];

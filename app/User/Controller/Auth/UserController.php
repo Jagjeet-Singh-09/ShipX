@@ -7,6 +7,9 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Validations\UserValidations;
 
+/**
+ * Controller for user management endpoints.
+ */
 class UserController extends BaseController
 {
     /**
@@ -15,89 +18,22 @@ class UserController extends BaseController
      * @var UserService
      */
     protected UserService $userService;
-    protected UserValidations $userValidations;
 
+    /**
+     * Validation helper for user requests.
+     *
+     * @var UserValidations
+     */
+    protected UserValidations $userValidations;
 
     /**
      * Constructor.
-     * Initializes the UserService object.
+     * Initializes the UserService and validation helper.
      */
     public function __construct()
     {
         $this->userService = new UserService();
-         $this->userValidations = new UserValidations();
-    }
-    /**
-     * Create a new user.
-     *
-     * Reads JSON request data and passes it to the service layer
-     * for user creation.
-     *
-     * @return ResponseInterface
-     */
-    public function addUser(): ResponseInterface
-    {
-        $data = $this->request->getJSON(true);
-
-        $email = $data['email'];
-        
-
-        if (!$this->userValidations->checkEmail($email)) {
-            return $this->response
-                ->setStatusCode(400)
-                ->setJSON([
-                    'status' => 'error',
-                    'message' => 'Please add Valid Email'
-                ]);
-        }
-
-        
-        $password = $data['password'];
-
-        if (!$this->userValidations->checkPassword($password)) {
-            return $this->response
-                ->setStatusCode(400)
-                ->setJSON([
-                    'status' => 'error',
-                    'message' => 'Please add Valid Password'
-                ]);
-        }
-
-        $phoneNumber = $data['phone'];
-        if (!$this->userValidations->checkMobileNumber($phoneNumber)) {
-            return $this->response
-                ->setStatusCode(400)
-                ->setJSON([
-                    'status' => 'error',
-                    'message' => 'Please add Valid Phone Number'
-                ]);
-        }
-
-
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-        $firstname = $data['first_name'];
-
-        if (!$this->userValidations->checkFirstName($firstname)) {
-            return $this->response
-                ->setStatusCode(400)
-                ->setJSON([
-                    'status' => 'error',
-                    'message' => 'Please add Valid First Name'
-                ]);
-        }
-        $lastname = $data['last_name'];
-
-        if (!$this->userValidations->checkLastName($lastname)) {
-            return $this->response
-                ->setStatusCode(400)
-                ->setJSON([
-                    'status' => 'error',
-                    'message' => 'Please add Valid Last Name'
-                ]);
-        }
-
-        return $this->userService->addUser($data);
+        $this->userValidations = new UserValidations();
     }
 
     /**
@@ -162,5 +98,6 @@ class UserController extends BaseController
 
         return $this->response->setJSON($result);
     }
+    
 
 }

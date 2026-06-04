@@ -6,6 +6,9 @@ use App\User\Model\Auth\UserModel;
 use App\Helpers\ApiResponseHelper;
 use CodeIgniter\HTTP\ResponseInterface;
 
+/**
+ * Service for user management business logic.
+ */
 class UserService
 {
     /**
@@ -30,49 +33,6 @@ class UserService
     {
         $this->userModel = new UserModel();
         $this->apiResponseHelper = new ApiResponseHelper();
-    }
-
-    /**
-     * Add a new user and set hierarchy.
-     *
-     * @param array $data User data
-     *
-     * @return ResponseInterface
-     */
-    public function addUser(array $data): ResponseInterface
-    {
-        // Insert user
-        $id = $this->userModel->addUser($data);
-
-        if (!$id) {
-
-            return $this->apiResponseHelper->apiResponseHandler(
-                "User Addition Failed",
-                null,
-                400
-            );
-        }
-
-        // Set user hierarchy
-        $setHierarchy = $this->userModel->setHierarchy(
-            $id,
-            $data['path']
-        );
-
-        if (!$setHierarchy) {
-
-            return $this->apiResponseHelper->apiResponseHandler(
-                "Hierarchy Setting Failed",
-                null,
-                400
-            );
-        }
-
-        return $this->apiResponseHelper->apiResponseHandler(
-            "User Addition Successful",
-            null,
-            200
-        );
     }
 
     /**

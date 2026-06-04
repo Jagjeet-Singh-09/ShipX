@@ -4,7 +4,12 @@ namespace App\User\Service\Auth;
 
 use App\User\Model\Auth\UserModel;
 use App\User\Model\Auth\AuthModel;
+use App\Helpers\ApiResponseHelper;
+use CodeIgniter\HTTP\ResponseInterface;
 
+/**
+ * Service for authentication-related business logic.
+ */
 class AuthService
 {
     /**
@@ -22,6 +27,13 @@ class AuthService
     protected UserModel $userModel;
 
     /**
+     * API response helper instance.
+     *
+     * @var ApiResponseHelper
+     */
+    protected ApiResponseHelper $ApiResponseHelper;
+
+    /**
      * Constructor.
      * Initializes model objects.
      */
@@ -29,6 +41,7 @@ class AuthService
     {
         $this->AuthModel = new AuthModel();
         $this->userModel = new UserModel();
+        $this->ApiResponseHelper = new ApiResponseHelper();
     }
 
     /**
@@ -36,29 +49,19 @@ class AuthService
      *
      * Also sets hierarchy for the created user.
      *
-     * @param string $phoneNumber User phone number
-     * @param string $email       User email address
-     * @param string $password    User hashed password
-     * @param string $firstName   User first name
-     * @param string $lastName    User last name
-     *
-     * @return array
+     * @param array $data User data
+     * @return array|null
      */
-    public function createUser(
-        string $phoneNumber,
-        string $email,
-        string $password,
-        string $firstName,
-        string $lastName
-    ): array {
-        // Create user
-        $user = $this->AuthModel->createUser(
-            $phoneNumber,
-            $email,
-            $password,
-            $firstName,
-            $lastName
-        );
+    public function createUser(array $data): ?array {
+
+        $phoneNumber = $data['phone'];
+        $email = $data['email'];
+        $password = $data['password'];
+        $firstName = $data['first_name'];
+        $lastName = $data['last_name'];
+        $path = $data['path'] ?? null;
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        $user = $this->AuthModel->createUser($phoneNumber, $email, $hashedPassword, $firstName, $lastName);
 
         // Set session
         $session = session();
@@ -70,8 +73,7 @@ class AuthService
             'id'         => $user['id'],
         ]);
 
-        // Set hierarchy for user
-        $this->userModel->setHierarchy($user['id'], null);
+        $this->userModel->setHierarchy($user['id'], $path);
 
         return $user;
     }
@@ -84,22 +86,19 @@ class AuthService
      * @param string $email    User email address
      * @param string $password User password
      *
-     * @return array
+     * @return ResponseInterface
      */
     public function checkLogIn(
         string $email,
         string $password
-    ): array {
+    ): ResponseInterface {
         // Fetch user by email
         $user = $this->AuthModel->getDataByMail($email);
 
         // Check if user exists
         if (!$user) {
 
-            return [
-                "status"  => "error",
-                "message" => "Email not found"
-            ];
+            return $this->ApiResponseHelper->apiResponseHandler("User not found", null, 404);
         }
 
         // Verify password
@@ -115,18 +114,10 @@ class AuthService
                 'id'         => $user['id'],
             ]);
 
-            return [
-                "status"  => "success",
-                "message" => "Login successful",
-                "user"    => $user
-            ];
+            return $this->ApiResponseHelper->apiResponseHandler("Login successful", $user, 200);
         }
 
         // Invalid password
-        return [
-            "status"  => "error",
-            "code"    => 401,
-            "message" => "Invalid password"
-        ];
+        return $this->ApiResponseHelper->apiResponseHandler("Invalid password", null, 401);
     }
 }
