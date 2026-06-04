@@ -125,6 +125,7 @@ _modules/*
 /results/
 /phpunit.xml
 
-.env
+
+
 /public/uploads/*
 
