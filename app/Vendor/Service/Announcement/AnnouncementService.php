@@ -6,7 +6,7 @@ use App\Vendor\Model\Announcement\AnnouncementModel;
 
 class AnnouncementService
 {
-    protected $AnnouncementModel;
+    protected AnnouncementModel $AnnouncementModel;
 
     public function __construct()
     {
@@ -15,7 +15,7 @@ class AnnouncementService
 
     }
 
-    public function getAllAnnouncement($id){
+    public function getAllAnnouncement(int $id){
         $data = $this->AnnouncementModel->getAllAnnouncement($id);
        
         return $data;

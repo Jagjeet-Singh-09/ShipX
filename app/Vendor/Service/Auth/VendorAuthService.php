@@ -10,16 +10,13 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class VendorAuthService
 {
-    protected $vendorAuthModel;
-    protected $groupController;
+    protected vendorAuthModel $vendorAuthModel;
     protected ApiResponseHelper $ApiResponseHelper;
 
     public function __construct()
     {
         $this->vendorAuthModel = new VendorAuthModel();
         $this->ApiResponseHelper = new ApiResponseHelper();
-        //$this->groupController=new GroupController();
-
     }
 
     public function vendorRegister( array $data)
@@ -51,6 +48,7 @@ class VendorAuthService
         $result = $this->vendorAuthModel->stepThreeData($data, $id);
         return $result;
     }
+    
 
     public function checkLogIn(
         string $email,

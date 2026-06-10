@@ -27,11 +27,13 @@ $routes->get('/api/user/getAllAnnouncement', '\App\User\Controller\Annoucement\A
 $routes->post('/api/user/updateAnnouncement', '\App\User\Controller\Annoucement\AnnouncementController::updateAnnouncement');
 $routes->post('/api/vendor/getAnnouncements/(:num)', '\App\Vendor\Controller\Announcement\AnnouncementController::getAllAnnouncement/$1');
 
-
-
 $routes->post('/api/vendor/register', '\App\Vendor\Controller\Auth\VendorAuthController::vendorRegister');
 $routes->post('/api/vendor/stepOneData', '\App\Vendor\Controller\Auth\VendorAuthController::stepOneData');
 $routes->post('/api/vendor/stepTwoData', '\App\Vendor\Controller\Auth\VendorAuthController::stepTwoData');
 $routes->post('/api/vendor/stepThreeData', '\App\Vendor\Controller\Auth\VendorAuthController::stepThreeData');
+
+$routes->get('paymentPage', '\App\Vendor\Controller\Wallet\PaymentController::openPaymentPage');
+$routes->post('/api/payment/create-order', '\App\Vendor\Controller\Wallet\PaymentController::createOrder');
+$routes->post('/api/payment/verify', '\App\Vendor\Controller\Wallet\PaymentController::verifyPayment');
 
 
